@@ -15,20 +15,23 @@ class Screen:
         self.timer = pygame.time.Clock()
 
         self.comic = pygame.font.SysFont('Comic Sans MS', 30)
-        self.text_surface = self.comic.render("", False, (255, 0, 0))
+        self.score_text = self.comic.render("", False, (255, 0, 0))
+        self.highscore_text = self.comic.render("", False, (255, 255, 0))
 
 
     
     def render(self,player_list,apple,player):
         self.window.fill((0,0,0))
-        j=5
+        j=1
         for i in player_list:
-            pygame.draw.rect(self.window,(((255/2/len(player_list)*j)%255),0,255-((255/2/len(player_list)*j)%255)),(i[0]*self.rows,i[1]*self.colums,self.rows,self.colums))
+            pygame.draw.rect(self.window,(((255/len(player_list)*j)%255),(255/1.5/len(player_list)*j)%255,255-((255/len(player_list)*j)%255)),(i[0]*self.rows,i[1]*self.colums,self.rows,self.colums))
             j+=1
         pygame.draw.rect(self.window,(0,255,0),(apple[0]*self.rows,apple[1]*self.colums,self.rows,self.colums))
-        pygame.draw.rect(self.window,(255,255,0),(player[0]*self.rows,player[1]*self.colums,self.rows,self.colums))
+        pygame.draw.rect(self.window,(255,220,0),(player[0]*self.rows,player[1]*self.colums,self.rows,self.colums))
 
-        self.window.blit(self.text_surface, (self.rows*self.size[0]-self.rows-2*self.size[0],self.colums*self.size[1]-self.colums-(self.colums-2)*self.size[1]))
+        pygame.draw.rect(self.window,(50,50,50),(1*self.rows,32*self.colums,self.rows*self.size[0]-self.rows*2,self.colums*6))
+        self.window.blit(self.score_text, (self.size[0],(self.colums-1.5)*self.size[1]-self.colums-2))
+        self.window.blit(self.highscore_text, (self.size[0],(self.colums-1)*self.size[1]))
         pygame.display.flip()
         
         
@@ -37,10 +40,20 @@ class Screen:
 
 class Stats:            # work in progress
     def __init__(self):
+        
+             
+        try:
+            with open("highscore.txt", "r") as highscore: 
+                self.highscore = int(highscore.read())
+        except:
+            with open("highscore.txt","w") as highscore:
+                highscore.write("0")
+            self.highscore = 0
+            print("Couldn't read the highscore: Is the file deleted or the inside not a number? \n Reset Highscore.")
         self.score = 0
-        self.highscore = 0
         self.time = 0
         self.score_text = "Score: " + str(0)
+        self.highscore_text = "Highscore: " + str(self.highscore)
 
 class Snake:
     def __init__(self):
@@ -80,7 +93,6 @@ class Apple:
         self.xy = (random.randint(0,rows*2),random.randint(0,colums*2))
         while(self.xy in player_list):
             self.xy = (random.randint(0,rows*2),random.randint(0,colums*2))
-        print("Apple: Respawned")        
 
 class GameLoop:
     def __init__(self):
@@ -117,21 +129,27 @@ class GameLoop:
     def death(self):
         if self.player.xy[-1] in self.player.xy[:-1]:
             self.player.speed = 0
+            if len(self.player.xy)-4 > self.stats.highscore:
+                with open("highscore.txt", "w") as file:
+                    file.write(str(len(self.player.xy)-4))
+                    print("Your highscore was beaten!")
+            else:
+                print(self.stats.score, " ", self.stats.highscore)
 
 
 
     def tick(self):
         while self.player.speed != 0:
-            print(self.player.xy, " ",self.player.direction, " ", self.player.current, "  ", self.apple.xy)
             self.screen.timer.tick(self.player.speed)
             self.EventHandler()
             self.player.movement()
-            print(self.player.xy, "  ", self.player.current)
+
             self.death()
             self.ifeaten()
-            self.screen.text_surface = self.screen.comic.render(self.stats.score_text, False, (255, 0, 0))
-            self.screen.render(self.player.xy,self.apple.xy,self.player.current)
             
+            self.screen.score_text = self.screen.comic.render(self.stats.score_text, False, (255, 0, 0))
+            self.screen.highscore_text = self.screen.comic.render(self.stats.highscore_text, False, (255, 255, 0))
+            self.screen.render(self.player.xy,self.apple.xy,self.player.current)
 
         pygame.quit()
 
