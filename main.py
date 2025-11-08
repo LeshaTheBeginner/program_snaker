@@ -1,4 +1,3 @@
-
 import pygame
 import random
 
@@ -24,7 +23,7 @@ class Screen:
         self.window.fill((0,0,0))
         j=1
         for i in player_list:
-            pygame.draw.rect(self.window,(((255/len(player_list)*j)%255),(255/1.5/len(player_list)*j)%255,255-((255/len(player_list)*j)%255)),(i[0]*self.rows,i[1]*self.colums,self.rows,self.colums))
+            pygame.draw.rect(self.window,(((255/len(player_list)*j)%255),(255/1.5/len(player_list)*j)%255,255-((255/len(player_list)*j)%255)),(i[0]*self.rows,i[1]*self.colums,self.rows,self.colums)) # the player has orange-blue gradient. Divide the 255 by player parts and multiplies the value by the current snake part (excluding the head). To get Blue, 255 - do the same as for orange  
             j+=1
         pygame.draw.rect(self.window,(0,255,0),(apple[0]*self.rows,apple[1]*self.colums,self.rows,self.colums))
         pygame.draw.rect(self.window,(255,220,0),(player[0]*self.rows,player[1]*self.colums,self.rows,self.colums))
@@ -38,7 +37,7 @@ class Screen:
 
 
 
-class Stats:            # work in progress
+class Stats:
     def __init__(self):
         
              
@@ -46,7 +45,7 @@ class Stats:            # work in progress
             with open("highscore.txt", "r") as highscore: 
                 self.highscore = int(highscore.read())
         except:
-            with open("highscore.txt","w") as highscore:
+            with open("highscore.txt","w") as highscore: #create/reset highscore.txt if it's missing/corrupt
                 highscore.write("0")
             self.highscore = 0
             print("Couldn't read the highscore: Is the file deleted or the inside not a number? \n Reset Highscore.")
@@ -119,6 +118,7 @@ class GameLoop:
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     if self.player.direction != 3:
                         self.player.direction = 1
+                
 
     def ifeaten(self):
         if tuple(self.player.current) == self.apple.xy:
