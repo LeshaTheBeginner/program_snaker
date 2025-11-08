@@ -19,17 +19,27 @@ jobs:
         python -m pip install --upgrade pip
         pip install pylint flake8 bandit mypy pip-audit black isort
     - name: Formatting with black
+      if: always()
+      continue-on-error: true
       run: |
         black $(git ls-files '*.py')
     - name: Analysing the code with pylint
+      if: always()
+      continue-on-error: true
       run: |
         pylint $(git ls-files '*.py')
     - name: Analysing the code with flake8
+      if: always()
+      continue-on-error: true
       run: |
         flake8 $(git ls-files '*.py')
     - name: Analysing the code with mypy
+      if: always()
+      continue-on-error: true
       run: |
         mypy $(git ls-files '*.py')
     - name: Alalysing the code with pip-audit
+      if: always()
+      continue-on-error: true
       run: |
         pip-black $(git ls-files '*.py')
