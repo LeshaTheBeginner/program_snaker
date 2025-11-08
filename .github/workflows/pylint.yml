@@ -42,4 +42,4 @@ jobs:
       if: always()
       continue-on-error: true
       run: |
-        pip-audit $(git ls-files '*.py')
+        pip-audit 
