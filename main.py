@@ -16,8 +16,6 @@ class Screen:
         self.comic = pygame.font.SysFont('Comic Sans MS', 30)
         self.score_text = self.comic.render("", False, (255, 0, 0))
         self.highscore_text = self.comic.render("", False, (255, 255, 0))
-
-
     
     def render(self,player_list,apple,player):
         self.window.fill((0,0,0))
@@ -39,8 +37,6 @@ class Screen:
 
 class Stats:
     def __init__(self):
-        
-             
         try:
             with open("highscore.txt", "r") as highscore: 
                 self.highscore = int(highscore.read())
@@ -59,8 +55,10 @@ class Snake:
         self.size = 3
         self.xy = [(2,3),(3,3),(4,3),(5,3)]
         self.current = [5,3]
+        self.last = list(self.xy[-2])
         self.direction = 2 # 0 left 1 down 2 right 3 up
-        self.speed = 8
+        self.lastdirection = 2
+        self.speed = 4
     
     def movement(self):
         # 0,0 1,0 2,0 3,0 -> 1,0 2,0 3,0 3,1 ->  2,0 3,0 3,1 3,2
@@ -74,6 +72,7 @@ class Snake:
             self.current[1] -= 1
         
         self.xy.append(tuple(self.current))
+        self.last = list(self.xy[-2])
         self.xy.pop(0)              # starts replacing eevery xy with current, making the snake into 1 square
     
     def eat(self):
@@ -91,7 +90,7 @@ class Apple:
     def respawn(self,rows,colums,player_list):
         self.xy = (random.randint(0,rows*2),random.randint(0,colums*2))
         while(self.xy in player_list):
-            self.xy = (random.randint(0,rows*2),random.randint(0,colums*2))
+            self.xy = (random.randint(0,rows*2),random.randint(0,(colums*2)-1))
 
 class GameLoop:
     def __init__(self):
@@ -107,16 +106,16 @@ class GameLoop:
             elif event.type == pygame.KEYDOWN:
 
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    if self.player.direction != 2:
+                    if self.player.direction != 2 and self.player.last[0]+1 != self.player.current[0]: # self.player.last[0]+1 != self.player.current[0] : If my last piece.x + 1 is the same as my current piece, and i want to GO LEFT, i'm not going to be able to, because i don't want to smash into myself
                         self.player.direction = 0
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    if self.player.direction != 0:
+                    if self.player.direction != 0 and self.player.last[0]-1 != self.player.current[0]:
                         self.player.direction = 2
                 elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                    if self.player.direction != 1:
+                    if self.player.direction != 1 and self.player.last[1]+1 != self.player.current[1]:
                         self.player.direction = 3
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    if self.player.direction != 3:
+                    if self.player.direction != 3 and self.player.last[1]-1 != self.player.current[1]:
                         self.player.direction = 1
                 
 
@@ -143,7 +142,6 @@ class GameLoop:
             self.screen.timer.tick(self.player.speed)
             self.EventHandler()
             self.player.movement()
-
             self.death()
             self.ifeaten()
             
