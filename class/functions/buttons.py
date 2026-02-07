@@ -1,6 +1,6 @@
 import tkinter as tk
 import os
-from Importation import *
+from importation import Importation
 
 class App_Launch(tk.Button):
     def __init__(self,path,image,app):
